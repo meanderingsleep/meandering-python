@@ -23,6 +23,11 @@ chat_completion = client.chat.completions.create(
     model="gpt-4-1106-preview",
 )
 
+# create a text file so we can check the story it wrote
+bedtime_story = "bedtime_story.txt"
+with open(bedtime_story, 'w') as file:
+    file.write(chat_completion.choices[0].message.content)
+
 # convert the text to audio
 response = client.audio.speech.create(
   model="tts-1-hd", # Added "hd" because its apparently better
