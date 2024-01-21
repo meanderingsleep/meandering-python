@@ -25,8 +25,8 @@ chat_completion = client.chat.completions.create(
 
 # convert the text to audio
 response = client.audio.speech.create(
-  model="tts-1",
-  voice="alloy",
+  model="tts-1-hd", # Added "hd" because its apparently better
+  voice="onyx", # Onyx is the sleepiest voice in my opinion
   input=chat_completion.choices[0].message.content
 )
 
