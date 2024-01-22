@@ -17,13 +17,11 @@ freeplay_chat = Freeplay(
     freeplay_api_key=os.environ['FREEPLAY_API_KEY'],
     api_base=f'https://{os.environ["FREEPLAY_CUSTOMER_NAME"]}.freeplay.ai/api')
 
-freeplay_environment = os.environ.get("FREEPLAY_ENVIRONMENT")
-
 chat_completion = freeplay_chat.get_completion(
     project_id=os.environ['FREEPLAY_PROJECT_ID'],
     template_name="story",
     variables={},
-    tag=freeplay_environment)
+    tag=os.environ.get("FREEPLAY_ENVIRONMENT"))
 
 # convert the text to audio
 response = client.audio.speech.create(
