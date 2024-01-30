@@ -1,17 +1,16 @@
 # sleepless
 
-# Challenges: 
+# NEAR TODO: 
 
-- Text to speech has, at most, 4096 characters per request.
-This means that we will need to batch requests and stitch MP3's together.
+- Chunk audio using Eleven labs.
+    - Make the hop between audio files seamless. Because there will be an uncomfortable jump when they are stiched.
 
-- Although gpt-4-1106-preview has a 128k context window, 
-this does not mean it can output up to 128k output tokens.
-This just means that you could fit something like 300 pages of text into the _prompt_.
+- Write out the Audioplayer app for android and IOS.
+    - Play button + basic audio controls. 
 
-# Concepts to understand:
+# FAR TODO:
 
-"Context window": The context window for a large language model (LLM) like OpenAI’s GPT refers to the maximum amount of text the model can consider at any one time when generating a response. This includes both the prompt provided by the user and the model’s generated text.
-In practical terms, the context window limits how much previous dialogue the model can “remember” during an interaction.
+- Get account UI going as well as respective database.
+    - Learn subscription modeling. 
 
-Imagine you are a business with hundreds of pages of documents: which model best suits you?
+- Begin to learn what it means to get apps on to Playstore/Appstore
