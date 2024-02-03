@@ -3,15 +3,17 @@ import os
 from openai import OpenAI
 import io
 from pathlib import Path
-from freeplay import Freeplay
+from freeplay import Freeplay 
 from freeplay.provider_config import ProviderConfig, OpenAIConfig
 import requests
-import boto3
+import boto3 # For Amazon S3 uploading
+from botocore.exceptions import NoCredentialsError  # Import NoCredentialsError
+
 
 load_dotenv() 
 
-ACCESS_KEY = 'HUO7aD97iNHCsSMdq1T4XwvBCvE/Pi8l4qGc6c1H'
-SECRET_KEY = 'HUO7aD97iNHCsSMdq1T4XwvBCvE/Pi8l4qGc6c1H'
+ACCESS_KEY = os.environ.get("ACCESS_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 CHUNK_SIZE = 1024
 url = "https://api.elevenlabs.io/v1/text-to-speech/zcAOhNBS3c14rBihAFp1"
@@ -19,7 +21,7 @@ url = "https://api.elevenlabs.io/v1/text-to-speech/zcAOhNBS3c14rBihAFp1"
 headers = {
   "Accept": "audio/mpeg",
   "Content-Type": "application/json",
-  "xi-api-key": "840338e4e5aae250ae8e7f47d0c5b512"
+  "xi-api-key": os.environ.get("XI_API_KEY")
 }
 
 client = OpenAI(
@@ -49,7 +51,7 @@ data = {
 }
 
 response = requests.post(url, json=data, headers=headers)
-with open('output.mp3', 'wb') as f:
+with open('output1.mp3', 'wb') as f:
     for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
         if chunk:
             f.write(chunk)
@@ -69,5 +71,4 @@ def upload_to_aws(local_file, bucket, s3_file):
         print("Credentials not available")
         return False
 
-
-uploaded = upload_to_aws('output', 'bucket_name', 's3_file_name')
+uploaded = upload_to_aws('output1.mp3', 'sleeplesslv', 'output1.mp3')
