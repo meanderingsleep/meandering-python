@@ -9,11 +9,7 @@ import requests
 import boto3 # For Amazon S3 uploading
 from botocore.exceptions import NoCredentialsError  # Import NoCredentialsError
 
-
 load_dotenv() 
-
-ACCESS_KEY = os.environ.get("ACCESS_KEY")
-SECRET_KEY = os.environ.get("SECRET_KEY")
 
 CHUNK_SIZE = 1024
 url = "https://api.elevenlabs.io/v1/text-to-speech/zcAOhNBS3c14rBihAFp1"
@@ -28,6 +24,7 @@ client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
 )
 
+# Freeplay prompting configuration
 freeplay_chat = Freeplay(
     provider_config=ProviderConfig(openai=OpenAIConfig(os.environ['OPENAI_API_KEY'])),
     freeplay_api_key=os.environ['FREEPLAY_API_KEY'],
@@ -41,24 +38,36 @@ chat_completion = freeplay_chat.get_completion(
     variables={},
     tag=freeplay_environment)
 
-data = {
-  "text": chat_completion.content,
-  "model_id": "eleven_monolingual_v1",
-  "voice_settings": {
-    "stability": 0.5,
-    "similarity_boost": 0.5
-  }
-}
+# Eleven Labs settings
+# data = {
+#   "text": chat_completion.content,
+#   "model_id": "eleven_monolingual_v1",
+#   "voice_settings": {
+#     "stability": 0.5,
+#     "similarity_boost": 0.5
+#   }
+# }
 
-response = requests.post(url, json=data, headers=headers)
-with open('output1.mp3', 'wb') as f:
-    for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
-        if chunk:
-            f.write(chunk)
+# OpenAI instead of ElevenLabs text to speech (I ran out of credits for Eleven Labs)
+response = client.audio.speech.create(
+  model="tts-1-hd", # Added "hd" because its apparently better
+  voice="onyx", # Onyx is the sleepiest voice in my opinion
+  input=chat_completion.content
+)
 
+response.write_to_file(Path(__file__).parent / "output.mp3")
+
+# Request from Eleven Labs and write it to output.mp3
+# response = requests.post(url, json=data, headers=headers)
+# with open('output.mp3', 'wb') as f:
+#     for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+#         if chunk:
+#             f.write(chunk)
+
+# AWS Upload Setup
 def upload_to_aws(local_file, bucket, s3_file):
-    s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY,
-                      aws_secret_access_key=SECRET_KEY)
+    s3 = boto3.client('s3', aws_access_key_id=os.environ.get("ACCESS_KEY"),
+                      aws_secret_access_key=os.environ.get("SECRET_KEY"))
 
     try:
         s3.upload_file(local_file, bucket, s3_file)
@@ -71,4 +80,4 @@ def upload_to_aws(local_file, bucket, s3_file):
         print("Credentials not available")
         return False
 
-uploaded = upload_to_aws('output1.mp3', 'sleeplesslv', 'output1.mp3')
+uploaded = upload_to_aws('output.mp3', 'sleeplesslv', 'output.mp3') # Upload to the sleepless AWS S3 bucket
