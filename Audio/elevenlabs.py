@@ -7,7 +7,7 @@ from freeplay import Freeplay
 from freeplay.provider_config import ProviderConfig, OpenAIConfig
 import requests
 import boto3 # For Amazon S3 uploading
-from botocore.exceptions import NoCredentialsError  # Import NoCredentialsError
+from botocore.exceptions import NoCredentialsError
 
 load_dotenv() 
 
