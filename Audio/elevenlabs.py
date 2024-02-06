@@ -12,7 +12,7 @@ from botocore.exceptions import NoCredentialsError
 load_dotenv() 
 
 CHUNK_SIZE = 1024
-url = "https://api.elevenlabs.io/v1/text-to-speech/zcAOhNBS3c14rBihAFp1"
+url = "https://api.elevenlabs.io/v1/text-to-speech/zcAOhNBS3c14rBihAFp1" # Elevenlabs voice url
 
 headers = {
   "Accept": "audio/mpeg",
@@ -32,52 +32,54 @@ freeplay_chat = Freeplay(
 
 freeplay_environment = os.environ.get("FREEPLAY_ENVIRONMENT")
 
-chat_completion = freeplay_chat.get_completion(
+story = freeplay_chat.get_completion(
     project_id=os.environ['FREEPLAY_PROJECT_ID'],
-    template_name="story",
+    template_name="initialize_story",
     variables={},
     tag=freeplay_environment)
 
-# Eleven Labs settings
-# data = {
-#   "text": chat_completion.content,
-#   "model_id": "eleven_monolingual_v1",
-#   "voice_settings": {
-#     "stability": 0.5,
-#     "similarity_boost": 0.5
-#   }
-# }
+def getLast20Words(context):
+    context_words = context.split()  # Split the string into a list of words
+    last_20_words = context_words[-20:]  # Get the last 20 words
+    context = ' '.join(last_20_words)  # Join the words back into a string
+    return context
 
-# OpenAI instead of ElevenLabs text to speech (I ran out of credits for Eleven Labs)
-response = client.audio.speech.create(
-  model="tts-1-hd", # Added "hd" because its apparently better
-  voice="onyx", # Onyx is the sleepiest voice in my opinion
-  input=chat_completion.content
-)
+context = getLast20Words(story.content)
 
-response.write_to_file(Path(__file__).parent / "output.mp3")
+i = 1
+while i < 7: # 7 chunks of text and audio at 3500 tokens of text each
+    if (i != 1):
+        story = freeplay_chat.get_completion(
+            project_id=os.environ['FREEPLAY_PROJECT_ID'],
+            template_name="continue_story",
+            variables={"context":context},
+            tag=freeplay_environment)
+        context = getLast20Words(story.content)
+    
+    # OpenAI instead of ElevenLabs text to speech (I ran out of credits for Eleven Labs)
+    response = client.audio.speech.create(
+        model="tts-1-hd", # Added "hd" because its apparently better
+        voice="onyx", # Onyx is the sleepiest voice in my opinion
+        input=story.content
+    )
 
-# Request from Eleven Labs and write it to output.mp3
-# response = requests.post(url, json=data, headers=headers)
-# with open('output.mp3', 'wb') as f:
-#     for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
-#         if chunk:
-#             f.write(chunk)
+    response.write_to_file(Path(__file__).parent / f"output{i}.mp3")
 
-# AWS Upload Setup
-def upload_to_aws(local_file, bucket, s3_file):
-    s3 = boto3.client('s3', aws_access_key_id=os.environ.get("ACCESS_KEY"),
-                      aws_secret_access_key=os.environ.get("SECRET_KEY"))
+    # AWS Upload Setup
+    def upload_to_aws(local_file, bucket, s3_file):
+        s3 = boto3.client('s3', aws_access_key_id=os.environ.get("ACCESS_KEY"),
+                        aws_secret_access_key=os.environ.get("SECRET_KEY"))
 
-    try:
-        s3.upload_file(local_file, bucket, s3_file)
-        print("Upload Successful")
-        return True
-    except FileNotFoundError:
-        print("The file was not found")
-        return False
-    except NoCredentialsError:
-        print("Credentials not available")
-        return False
+        try:
+            s3.upload_file(local_file, bucket, s3_file)
+            print("Upload Successful")
+            return True
+        except FileNotFoundError:
+            print("The file was not found")
+            return False
+        except NoCredentialsError:
+            print("Credentials not available")
+            return False
 
-uploaded = upload_to_aws('output.mp3', 'sleeplesslv', 'output.mp3') # Upload to the sleepless AWS S3 bucket
+    uploaded = upload_to_aws(f'output{i}.mp3', 'sleeplesslv', f'output{i}.mp3') # Upload to the sleepless AWS S3 bucket
+    i = i + 1
