@@ -11,7 +11,6 @@ from botocore.exceptions import NoCredentialsError
 from pydub import AudioSegment
 from ffmpeg import FFmpeg
 
-
 load_dotenv() 
 
 client = OpenAI(
