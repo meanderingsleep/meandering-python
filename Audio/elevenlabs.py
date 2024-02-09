@@ -9,6 +9,7 @@ import requests
 import boto3 # For Amazon S3 uploading
 from botocore.exceptions import NoCredentialsError
 from pydub import AudioSegment
+from ffmpeg import FFmpeg
 
 
 load_dotenv() 
