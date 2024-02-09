@@ -7,9 +7,6 @@ requirements:
 
 # Near todo: 
 
-- Chunk audio using Eleven labs.
-    - Make the hop between audio files seamless. Because there will be an uncomfortable jump when they are stiched.
-
 - Write out the Audioplayer app for android and IOS.
     - Play button + basic audio controls. 
 
