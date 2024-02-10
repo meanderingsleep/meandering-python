@@ -6,7 +6,6 @@ from pathlib import Path
 from freeplay import Freeplay 
 from freeplay.provider_config import ProviderConfig, OpenAIConfig
 import requests
-import boto3 # For Amazon S3 uploading
 from botocore.exceptions import NoCredentialsError
 from pydub import AudioSegment
 from ffmpeg import FFmpeg
@@ -24,9 +23,7 @@ except:
     print("Usage: " + sys.argv[0] + " loopCount")
     sys.exit()
 
-client = OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY"),
-)
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 # Freeplay prompting configuration
 freeplay_chat = Freeplay(
@@ -35,22 +32,6 @@ freeplay_chat = Freeplay(
     api_base=f'https://{os.environ["FREEPLAY_CUSTOMER_NAME"]}.freeplay.ai/api')
 
 freeplay_environment = os.environ.get("FREEPLAY_ENVIRONMENT")
-
-# AWS Upload Setup
-def upload_to_aws(local_file, bucket, s3_file):
-    s3 = boto3.client('s3', aws_access_key_id=os.environ.get("ACCESS_KEY"),
-                    aws_secret_access_key=os.environ.get("SECRET_KEY"))
-
-    try:
-        s3.upload_file(local_file, bucket, s3_file)
-        print("Upload Successful")
-        return True
-    except FileNotFoundError:
-        print("The file was not found")
-        return False
-    except NoCredentialsError:
-        print("Credentials not available")
-        return False
 
 # The initial story chunk
 story = freeplay_chat.get_completion(
@@ -62,7 +43,7 @@ story = freeplay_chat.get_completion(
 context = utils.getLast20Words(story.content)
 merged = AudioSegment.empty()
 
-# Generate 7 total chunks of text/audio
+# Generate chunks of text/audio
 i = 1
 while i <= int(loopCount): 
     if (i != 1):
@@ -86,8 +67,8 @@ while i <= int(loopCount):
     output = AudioSegment.from_file(f'output{i}.wav')
     merged =  merged + output
 
-    i = i + 1
+    i += 1
 
 outputFileName = "final_output.wav"
 merged.export(outputFileName, format="wav")
-uploaded = upload_to_aws(outputFileName, 'sleeplesslv', outputFileName) # Upload the final file to the AWS S3 bucket
+uploaded = utils.upload_to_aws(outputFileName, 'sleeplesslv', outputFileName) # Upload the final file to the AWS S3 bucket
