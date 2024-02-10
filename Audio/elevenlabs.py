@@ -88,5 +88,6 @@ while i <= int(loopCount):
 
     i = i + 1
 
-merged.export("final_output.wav", format="wav")
-uploaded = upload_to_aws('final_output.wav') # Upload the final file to the AWS S3 bucket
+outputFileName = "final_output.wav"
+merged.export(outputFileName, format="wav")
+uploaded = upload_to_aws(outputFileName, 'sleeplesslv', outputFileName) # Upload the final file to the AWS S3 bucket
