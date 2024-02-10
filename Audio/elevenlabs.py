@@ -44,16 +44,8 @@ context = utils.getLast20Words(story.content)
 merged = AudioSegment.empty()
 
 # Generate chunks of text/audio
-i = 1
-while i <= int(loopCount): 
-    if (i != 1):
-        story = freeplay_chat.get_completion(
-            project_id=os.environ['FREEPLAY_PROJECT_ID'],
-            template_name="continue_story",
-            variables={"context":context},
-            tag=freeplay_environment)
-        context = getLast20Words(story.content)
-    
+i = 0
+while i < int(loopCount): 
     # Generate OpenAI instead of ElevenLabs text to speech 
     response = client.audio.speech.create(
         model="tts-1-hd",
@@ -62,10 +54,17 @@ while i <= int(loopCount):
     )
 
     # Write out the current chunk as an wav
-    response.write_to_file(Path(__file__).parent / f"output{i}.wav")
+    response.write_to_file(Path(__file__).parent / f"temp_output{i}.wav")
 
-    output = AudioSegment.from_file(f'output{i}.wav')
-    merged =  merged + output
+    merged += AudioSegment.from_file(f'temp_output{i}.wav')
+
+    if (i): # skip this section first time through the loop. this should be dealt with differnetly
+        story = freeplay_chat.get_completion(
+            project_id=os.environ['FREEPLAY_PROJECT_ID'],
+            template_name="continue_story",
+            variables={"context":context},
+            tag=freeplay_environment)
+        context = getLast20Words(story.content)   
 
     i += 1
 
