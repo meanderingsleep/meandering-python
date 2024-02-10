@@ -10,8 +10,19 @@ import boto3 # For Amazon S3 uploading
 from botocore.exceptions import NoCredentialsError
 from pydub import AudioSegment
 from ffmpeg import FFmpeg
+import utils
+import sys
 
 load_dotenv() 
+
+# make sure the correct number of arguments were passed in.
+try:
+    len(sys.argv) == 2
+    loopCount = sys.argv[1]
+    print("Looping " + sys.argv[1] + " times.")
+except:
+    print("Usage: " + sys.argv[0] + " loopCount")
+    sys.exit()
 
 client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
@@ -40,7 +51,7 @@ def upload_to_aws(local_file, bucket, s3_file):
     except NoCredentialsError:
         print("Credentials not available")
         return False
-        
+
 # The initial story chunk
 story = freeplay_chat.get_completion(
     project_id=os.environ['FREEPLAY_PROJECT_ID'],
@@ -48,19 +59,12 @@ story = freeplay_chat.get_completion(
     variables={},
     tag=freeplay_environment)
 
-# Get some context from the the previous story output
-def getLast20Words(context):
-    context_words = context.split()
-    last_20_words = context_words[-20:]
-    context = ' '.join(last_20_words)
-    return context
-
-context = getLast20Words(story.content)
+context = utils.getLast20Words(story.content)
 merged = AudioSegment.empty()
 
 # Generate 7 total chunks of text/audio
 i = 1
-while i <= 50: 
+while i <= int(loopCount): 
     if (i != 1):
         story = freeplay_chat.get_completion(
             project_id=os.environ['FREEPLAY_PROJECT_ID'],
