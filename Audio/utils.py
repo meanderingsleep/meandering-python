@@ -2,6 +2,8 @@ from dotenv import load_dotenv #for .env variables like the API key
 import boto3 # For Amazon S3 uploading
 import os
 
+load_dotenv() 
+
 # Get some context from the the previous story output
 def getLast20Words(context):
     context_words = context.split()
