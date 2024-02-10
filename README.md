@@ -5,6 +5,9 @@ requirements:
 - pip install -r requiements.txt
 - ffmpeg install near bottom of - https://github.com/jiaaro/pydub#installation
 
+tests:
+run "python audiotests.py" to make sure tests pass.
+
 # Near todo: 
 
 - Write out the Audioplayer app for android and IOS.
