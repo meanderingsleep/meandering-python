@@ -1,5 +1,6 @@
 from dotenv import load_dotenv #for .env variables like the API key
 import boto3 # For Amazon S3 uploading
+from botocore.exceptions import NoCredentialsError
 import os
 
 load_dotenv() 
@@ -17,21 +18,18 @@ def upload_to_aws(local_file, bucket, s3_file):
 
     try:
         s3.upload_file(local_file, bucket, s3_file)
-        #print("Upload Successful")
     except FileNotFoundError:
-        #print("Local file not found")
         raise FileNotFoundError
     except NoCredentialsError:
-        #print("Credentials not available")
         raise NoCredentialsError
     
-def deleteTempWavs(loopCount):
+def deleteTempMp3(loopCount):
     i = 0
     while i < int(loopCount):
         try:
-            os.remove(f'temp_output{i}.wav')
+            os.remove(f'temp_output{i}.mp3')
         except FileNotFoundError:
-            print(f'temp_output{i}.wav not found.')
+            print(f'temp_output{i}.mp3 not found.')
         except Exception as e:
-            print(f'Error deleting temp_output{i}.wav: {e}')
+            print(f'Error deleting temp_output{i}.mp3: {e}')
         i += 1

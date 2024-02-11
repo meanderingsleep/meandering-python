@@ -11,6 +11,7 @@ from pydub import AudioSegment
 from ffmpeg import FFmpeg
 import utils
 import sys
+import datetime
 
 load_dotenv() 
 
@@ -54,12 +55,12 @@ while i < int(loopCount):
         input=story.content
     )
 
-    response.write_to_file(Path(__file__).parent / f"temp_output{i}.wav")
-    merged += AudioSegment.from_file(f'temp_output{i}.wav')
+    response.write_to_file(Path(__file__).parent / f"temp_output{i}.mp3")
+    merged += AudioSegment.from_file(f'temp_output{i}.mp3')
     i += 1
 
-# Export final file to cloud
-outputFileName = "final_output.wav"
-merged.export(outputFileName, format="wav")
-uploaded = utils.upload_to_aws(outputFileName, 'sleeplesslv', outputFileName) # Upload the final file to the AWS S3 bucket
-utils.deleteTempWavs(loopCount)
+# Export final file to cloud and cleanup temp files
+outputFileName = "final_output.mp3"
+merged.export(outputFileName, format="mp3", bitrate="192k")
+uploaded = utils.upload_to_aws(outputFileName, 'sleeplesslv', outputFileName)
+utils.deleteTempMp3(loopCount)
