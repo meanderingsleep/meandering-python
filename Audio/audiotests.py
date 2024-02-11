@@ -3,6 +3,7 @@ import utils
 import os
 from pathlib import Path
 from openai import OpenAI
+from pydub import AudioSegment
 
 class TestContextBridge(unittest.TestCase):
 
@@ -34,14 +35,25 @@ class TestAudioCreation(unittest.TestCase):
 
 	def setUp(self):
 		self.client = client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+		self.textInput = "This is a test of some text for tts conversion."
 
 	def test_audio_file_creation(self):
 		fileName = Path(__file__).parent / f"test_output.wav"
-		response = self.client.audio.speech.create(model="tts-1-hd", voice="onyx", input="This is a test.")
+		response = self.client.audio.speech.create(model="tts-1-hd", voice="onyx", input=self.textInput)
 		response.write_to_file(fileName)
 
 		self.assertTrue(os.path.getsize(fileName) > 1)
 		os.remove(fileName)
+
+	def test_audio_file_duration(self):
+		fileName = Path(__file__).parent / f"test_output.wav"
+		response = self.client.audio.speech.create(model="tts-1-hd", voice="onyx", input=self.textInput)
+		response.write_to_file(fileName)
+		self.assertTrue(AudioSegment.from_file(fileName).duration_seconds > 1)
+		os.remove(fileName)
+
+		
+
 
 
 if __name__ == '__main__':
