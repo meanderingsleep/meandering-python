@@ -24,3 +24,14 @@ def upload_to_aws(local_file, bucket, s3_file):
     except NoCredentialsError:
         #print("Credentials not available")
         raise NoCredentialsError
+    
+def deleteTempWavs(loopCount):
+    i = 0
+    while i < int(loopCount):
+        try:
+            os.remove(f'temp_output{i}.wav')
+        except FileNotFoundError:
+            print(f'temp_output{i}.wav not found.')
+        except Exception as e:
+            print(f'Error deleting temp_output{i}.wav: {e}')
+        i += 1

@@ -33,41 +33,33 @@ freeplay_chat = Freeplay(
 
 freeplay_environment = os.environ.get("FREEPLAY_ENVIRONMENT")
 
-# The initial story chunk
-story = freeplay_chat.get_completion(
-    project_id=os.environ['FREEPLAY_PROJECT_ID'],
-    template_name="initialize_story",
-    variables={},
-    tag=freeplay_environment)
-
-context = utils.getLast20Words(story.content)
 merged = AudioSegment.empty()
+context=""
+i = 0
 
 # Generate chunks of text/audio
-i = 0
 while i < int(loopCount): 
-    # Generate OpenAI instead of ElevenLabs text to speech 
+    story = freeplay_chat.get_completion(
+        project_id=os.environ['FREEPLAY_PROJECT_ID'],
+        template_name="initialize_story",
+        variables={"context":context},
+        tag=freeplay_environment
+    )
+
+    context = utils.getLast20Words(story.content)
+
     response = client.audio.speech.create(
         model="tts-1-hd",
         voice="onyx",
         input=story.content
     )
 
-    # Write out the current chunk as an wav
     response.write_to_file(Path(__file__).parent / f"temp_output{i}.wav")
-
     merged += AudioSegment.from_file(f'temp_output{i}.wav')
-
-    if (i): # skip this section first time through the loop. this should be dealt with differnetly
-        story = freeplay_chat.get_completion(
-            project_id=os.environ['FREEPLAY_PROJECT_ID'],
-            template_name="continue_story",
-            variables={"context":context},
-            tag=freeplay_environment)
-        context = getLast20Words(story.content)   
-
     i += 1
 
+# Export final file to cloud
 outputFileName = "final_output.wav"
 merged.export(outputFileName, format="wav")
 uploaded = utils.upload_to_aws(outputFileName, 'sleeplesslv', outputFileName) # Upload the final file to the AWS S3 bucket
+utils.deleteTempWavs(loopCount)
