@@ -1,5 +1,8 @@
 import unittest
 import utils
+import os
+from pathlib import Path
+from openai import OpenAI
 
 class TestContextBridge(unittest.TestCase):
 
@@ -26,6 +29,20 @@ class TestCloudFileStorage(unittest.TestCase):
 	def test_local_file_not_found(self):
 		with self.assertRaises(FileNotFoundError):
 			utils.upload_to_aws("bogus_123", "", "")
+
+class TestAudioCreation(unittest.TestCase):
+
+	def setUp(self):
+		self.client = client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+	def test_audio_file_creation(self):
+		fileName = Path(__file__).parent / f"test_output.wav"
+		response = self.client.audio.speech.create(model="tts-1-hd", voice="onyx", input="This is a test.")
+		response.write_to_file(fileName)
+
+		self.assertTrue(os.path.getsize(fileName) > 1)
+		os.remove(fileName)
+
 
 if __name__ == '__main__':
     unittest.main()
