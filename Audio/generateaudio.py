@@ -1,4 +1,4 @@
-from dotenv import load_dotenv #for .env variables like the API key
+from dotenv import load_dotenv
 import os
 from openai import OpenAI
 import io
@@ -11,7 +11,7 @@ from pydub import AudioSegment
 from ffmpeg import FFmpeg
 import utils
 import sys
-import datetime
+from datetime import date
 
 load_dotenv() 
 
@@ -60,7 +60,8 @@ while i < int(loopCount):
     i += 1
 
 # Export final file to cloud and cleanup temp files
-outputFileName = "final_output.mp3"
-merged.export(outputFileName, format="mp3", bitrate="192k")
-uploaded = utils.upload_to_aws(outputFileName, 'sleeplesslv', outputFileName)
+date = date.today()
+merged.export(f"{date}.mp3", format="mp3", bitrate="192k")
+uploaded = utils.upload_to_aws(f"{date}.mp3", 'sleeplesslv', f"{date}.mp3")
 utils.deleteTempMp3(loopCount)
+os.remove(f"{date}.mp3")
