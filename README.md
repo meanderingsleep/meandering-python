@@ -2,7 +2,7 @@
 
 requirements:
 - python 3.11.7 (3+ might work)
-- pip install -r requiements.txt
+- pip install -r requirements.txt
 - ffmpeg install near bottom of - https://github.com/jiaaro/pydub#installation
 
 tests:
