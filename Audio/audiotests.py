@@ -53,7 +53,32 @@ class TestAudioCreation(unittest.TestCase):
 		os.remove(fileName)
 
 		
+	def test_stitch_audio_files_together(self):
+		baseFileName = "test_audio_output"
+		finalOutputName = "test_combined_audio.mp3"
+		finalOutputPath = Path(__file__).parent / finalOutputName
+		test_string = "this is a test"
+		merged = AudioSegment.empty()
 
+		i = 0
+		for word in test_string.split():
+			self.client.audio.speech.create(model="tts-1-hd", voice="onyx", input=word).write_to_file(
+				Path(__file__).parent / (baseFileName + str(i))
+				)
+			merged += AudioSegment.from_file(Path(__file__).parent / (baseFileName + str(i)))
+			i += 1
+		merged.export(finalOutputName, format="mp3", bitrate="192k")
+
+		self.assertTrue(AudioSegment.from_file(finalOutputPath).duration_seconds > 1)
+		self.assertTrue(AudioSegment.from_file(finalOutputPath).duration_seconds > 
+			AudioSegment.from_file(Path(__file__).parent / (baseFileName + '0')).duration_seconds)
+
+		os.remove(finalOutputPath)
+
+		i = 0
+		for word in test_string.split():
+			os.remove(Path(__file__).parent / (baseFileName + str(i)))
+			i += 1
 
 
 if __name__ == '__main__':
