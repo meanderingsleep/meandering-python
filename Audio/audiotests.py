@@ -55,8 +55,7 @@ class TestAudioCreation(unittest.TestCase):
 		
 	def test_stitch_audio_files_together(self):
 		baseFileName = "test_audio_output"
-		finalOutputName = "test_combined_audio.mp3"
-		finalOutputPath = Path(__file__).parent / finalOutputName
+		finalOutputPath = Path(__file__).parent / "test_combined_audio.mp3"
 		test_string = "this is a test"
 		merged = AudioSegment.empty()
 
@@ -67,10 +66,20 @@ class TestAudioCreation(unittest.TestCase):
 				)
 			merged += AudioSegment.from_file(Path(__file__).parent / (baseFileName + str(i)))
 			i += 1
-		merged.export(finalOutputName, format="mp3", bitrate="192k")
 
-		self.assertTrue(AudioSegment.from_file(finalOutputPath).duration_seconds > 1)
-		self.assertTrue(AudioSegment.from_file(finalOutputPath).duration_seconds > 
+		# the pydub documentation suggests that the resulting file_handle that comes from the
+		# export() method does not require further action (such as close()'ing), but, I found when
+		# running these tests that a warning about dangling file handles appeared. if I explicity
+		# close the file_handle, the warning goes away. this could be because of how the unittest
+		# framework is doing things. I'm not sure.???
+		merged.export(finalOutputPath, format="mp3", bitrate="192k").close()
+
+		finalAudioSegment = AudioSegment.from_file(finalOutputPath)
+
+		self.assertTrue(finalAudioSegment.duration_seconds > 1)
+
+		# make sure the final is longer than one of the sub-parts
+		self.assertTrue(finalAudioSegment.duration_seconds > 
 			AudioSegment.from_file(Path(__file__).parent / (baseFileName + '0')).duration_seconds)
 
 		os.remove(finalOutputPath)
