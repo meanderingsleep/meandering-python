@@ -1,44 +1,41 @@
 # sleepless
 
 Requirements:
-- python 3.11.7 (3+ might work)
-- pip install -r requirements.txt
+- python 3.11.6 (3+ might work)
+- python3[.11] -m pip install -r requirements.txt (generate requirements.txt via pipreqs)
 - ffmpeg install near bottom of - https://github.com/jiaaro/pydub#installation
 
 Tests:
-run "python audiotests.py" to make sure tests pass.
+run "python3[.11] audiotests.py" to make sure tests pass.
 
-# Amazon Linux EC2 instance shell setup
+# Amazon Linux EC2 instance setup
 
-- sudo passwd ec2-user
+- SETUP base environment
+- sudo passwd ec2-user (this might not be required)
 - sudo yum install git -y
-- git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-- echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-- echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-- echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
-- sudo yum install gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel tk-devel libffi-devel
-- source ~/.bashrc
-- pyenv install 3.11.7
-- pyenv global 3.11.7
+- sudo yum install python3.11.x86_64
+- sudo yum install python3.11-pip.noarch
 - wget -O ffmpeg.tar.xz https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-amd64-static.tar.xz
 - tar xf ffmpeg.tar.xz
-- cd ffmpeg-git-20240213-amd64-static
-- sudo mv ffmpeg /usr/bin
-- sudo mv ffprobe /usr/bin
+- rm ffmpeg.tar.xz
+- sudo mv ffmpeg-git-20240213-amd64-static/ffmpeg /usr/bin
+- sudo mv ffmpeg-git-20240213-amd64-static/ffprobe /usr/bin
 
+- SETUP sleepless code repository
 - ssh-keygen
 - install new public key in github
 - git clone git@github.com:jvaleski/sleepless.git
 
-- setup api keys in the env
+- SETUP api keys in the env
 - follow .envexample on github
-- pip install -r requirements.txt
+- python3.11 -m pip install -r requirements.txt
 
+- SETUP cron
 - sudo yum install cronie
 - sudo systemctl start crond
 - sudo systemctl enable crond
 - sudo systemctl status crond
 
 - Add the following to crontab and adjust timing depending on needs
-- ~/.pyenv/shims/python /home/ec2-user/sleepless/Audio/generateaudio.py 2 > /usr/tmp/generateaudio.log 2>&1
+- python3.11 /home/ec2-user/sleepless/Audio/generateaudio.py 2 > /usr/tmp/generateaudio.log 2>&1
 - Also edit generateaudio.py to include the absolute path of the temp audio mp3 paths.

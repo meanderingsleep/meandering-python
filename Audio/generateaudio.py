@@ -60,8 +60,9 @@ while i < int(loopCount):
     i += 1
 
 # Export final file to cloud and cleanup temp files
-date = date.today()
-merged.export(f"{date}.mp3", format="mp3", bitrate="192k")
-uploaded = utils.upload_to_aws(f"{date}.mp3", 'sleeplesslv', f"{date}.mp3")
+finalOutputFilename = f"sleepless-{date.today()}.mp3"
+finalOutputPath = Path(__file__).parent / finalOutputFilename
+merged.export(finalOutputPath, format="mp3", bitrate="192k")
+uploaded = utils.upload_to_aws(finalOutputPath, 'sleeplesslv', finalOutputFilename)
 utils.deleteTempMp3(loopCount)
-os.remove(f"{date}.mp3")
+os.remove(finalOutputPath)
