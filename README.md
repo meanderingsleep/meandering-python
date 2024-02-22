@@ -32,3 +32,13 @@ run "python audiotests.py" to make sure tests pass.
 
 - setup api keys in the env
 - follow .envexample on github
+- pip install -r requirements.txt
+
+- sudo yum install cronie
+- sudo systemctl start crond
+- sudo systemctl enable crond
+- sudo systemctl status crond
+
+- Add the following to crontab and adjust timing depending on needs
+- ~/.pyenv/shims/python /home/ec2-user/sleepless/Audio/generateaudio.py 2 > /usr/tmp/generateaudio.log 2>&1
+- Also edit generateaudio.py to include the absolute path of the temp audio mp3 paths.
