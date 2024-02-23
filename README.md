@@ -1,7 +1,7 @@
 # sleepless
 
 Requirements:
-- python 3.11.6 (3+ might work)
+- python 3.11.6 (3.11.6+ might work)
 - python3[.11] -m pip install -r requirements.txt (generate requirements.txt via pipreqs)
 - ffmpeg install near bottom of - https://github.com/jiaaro/pydub#installation
 
