@@ -11,7 +11,6 @@ run "python3[.11] audiotests.py" to make sure tests pass.
 # Amazon Linux EC2 instance setup
 
 - SETUP base environment
-- sudo passwd ec2-user (this might not be required)
 - sudo yum install git -y
 - sudo yum install python3.11.x86_64
 - sudo yum install python3.11-pip.noarch
@@ -38,4 +37,4 @@ run "python3[.11] audiotests.py" to make sure tests pass.
 
 - Add the following to crontab and adjust timing depending on needs
 - python3.11 /home/ec2-user/sleepless/Audio/generateaudio.py 2 > /usr/tmp/generateaudio.log 2>&1
-- Also edit generateaudio.py to include the absolute path of the temp audio mp3 paths.
+- Also edit generateaudio.py to include the absolute path of the temp audio mp3 paths: /home/ec2-user/sleepless/Audio (this should be the path)
