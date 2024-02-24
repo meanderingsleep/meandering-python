@@ -5,6 +5,8 @@ from os.path import exists
 from pathlib import Path
 from openai import OpenAI
 from pydub import AudioSegment
+import boto3
+import botocore
 
 class TestFileCleanup(unittest.TestCase):
 
@@ -49,6 +51,40 @@ class TestCloudFileStorage(unittest.TestCase):
 	def test_local_file_not_found(self):
 		with self.assertRaises(FileNotFoundError):
 			utils.upload_to_aws("bogus_123", "", "")
+
+	def test_upload(self):
+		s3Bucket = os.environ.get("AWS_S3_BUCKET")
+
+		f1FileName = "DELETE_ME_TEST_DATA"
+		f1path = Path(__file__).parent / f1FileName
+		fp = open(f1path, 'w')
+		fp.write('TEST')
+		fp.close()
+
+		utils.upload_to_aws(f1path, s3Bucket, f1FileName)
+
+		os.remove(Path(__file__).parent / f1FileName)
+
+		bucketKeyExists = True
+
+		s3r = boto3.resource('s3', 
+			aws_access_key_id=os.environ.get("AWS_ACCESS_KEY"), 
+			aws_secret_access_key=os.environ.get("AWS_SECRET_KEY"))
+
+		try:
+			s3r.Object(s3Bucket, f1FileName).load()
+		except botocore.exceptions.ClientError as e:
+			if e.response['Error']['Code'] == "404":
+				bucketKeyExists = False
+
+		self.assertTrue(bucketKeyExists)
+
+		# cleanup s3
+		s3 = boto3.client('s3', 
+			aws_access_key_id=os.environ.get("AWS_ACCESS_KEY"), 
+			aws_secret_access_key=os.environ.get("AWS_SECRET_KEY"))
+		s3.delete_object(Bucket=s3Bucket, Key=f1FileName)
+
 
 class TestAudioCreation(unittest.TestCase):
 

@@ -63,6 +63,10 @@ while i < int(loopCount):
 finalOutputFilename = f"sleepless-{date.today()}.mp3"
 finalOutputPath = Path(__file__).parent / finalOutputFilename
 merged.export(finalOutputPath, format="mp3", bitrate="192k")
-uploaded = utils.upload_to_aws(finalOutputPath, 'sleeplesslv', finalOutputFilename)
+
+uploaded = utils.upload_to_aws(finalOutputPath, 
+    os.environ.get("AWS_S3_BUCKET"), 
+    finalOutputFilename)
+
 utils.deleteTempMp3(loopCount)
 os.remove(finalOutputPath)
