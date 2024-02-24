@@ -12,6 +12,8 @@ from ffmpeg import FFmpeg
 import utils
 import sys
 from datetime import date
+import datetime
+import time
 
 load_dotenv() 
 
@@ -49,11 +51,17 @@ while i < int(loopCount):
 
     context = utils.getLast20Words(story.content)
 
+    prevTime = datetime.datetime.now()
     response = client.audio.speech.create(
         model="tts-1-hd",
         voice="onyx",
         input=story.content
     )
+
+    # do some rudimentary rate limiting
+    ttsCallsPerMinute = 3
+    if (datetime.datetime.now() - prevTime).seconds < (60/ttsCallsPerMinute):
+        time.sleep(60-(60/ttsCallsPerMinute))
 
     response.write_to_file(Path(__file__).parent / f"temp_output{i}.mp3")
     merged += AudioSegment.from_file(Path(__file__).parent / f'temp_output{i}.mp3')
