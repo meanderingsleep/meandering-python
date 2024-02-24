@@ -1,9 +1,28 @@
 import unittest
 import utils
 import os
+from os.path import exists
 from pathlib import Path
 from openai import OpenAI
 from pydub import AudioSegment
+
+class TestFileCleanup(unittest.TestCase):
+
+	def setUp(self):
+		self.f0path = Path(__file__).parent / "temp_output0.mp3"
+		fp = open(self.f0path, 'w')
+		fp.write('text0')
+		fp.close()
+
+		self.f1path = Path(__file__).parent / "temp_output1.mp3"
+		fp = open(self.f1path, 'w')
+		fp.write('text1')
+		fp.close()
+
+	def test_temp_cleanup(self):
+		utils.deleteTempMp3(2)
+		self.assertFalse(exists(self.f0path))
+		self.assertFalse(exists(self.f1path))
 
 class TestContextBridge(unittest.TestCase):
 

@@ -2,6 +2,7 @@ from dotenv import load_dotenv #for .env variables like the API key
 import boto3 # For Amazon S3 uploading
 from botocore.exceptions import NoCredentialsError
 import os
+from pathlib import Path
 
 load_dotenv() 
 
