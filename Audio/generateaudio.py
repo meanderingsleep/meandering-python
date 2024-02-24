@@ -56,7 +56,7 @@ while i < int(loopCount):
     )
 
     response.write_to_file(Path(__file__).parent / f"temp_output{i}.mp3")
-    merged += AudioSegment.from_file(f'temp_output{i}.mp3')
+    merged += AudioSegment.from_file(Path(__file__).parent / f'temp_output{i}.mp3')
     i += 1
 
 # Export final file to cloud and cleanup temp files
