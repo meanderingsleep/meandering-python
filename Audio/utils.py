@@ -27,7 +27,7 @@ def deleteTempMp3(loopCount):
     i = 0
     while i < int(loopCount):
         try:
-            os.remove(f'temp_output{i}.mp3')
+            os.remove(Path(__file__).parent / f'temp_output{i}.mp3')
         except FileNotFoundError:
             print(f'temp_output{i}.mp3 not found.')
         except Exception as e:
