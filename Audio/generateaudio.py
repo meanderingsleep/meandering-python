@@ -18,10 +18,13 @@ import time
 load_dotenv() 
 
 # make sure the correct number of arguments were passed in.
+# i now want voice and story type passed in 
 try:
-    len(sys.argv) == 2
+    len(sys.argv) == 4
     loopCount = sys.argv[1]
-    print("Looping " + sys.argv[1] + " times.")
+    promptType = sys.argv[2] 
+    voiceType = sys.argv[3]
+    print("Looping: " + sys.argv[1] + " times" + "\n" + "Prompt: " + sys.argv[2] + "\n" + "Voice: " + sys.argv[3])
 except:
     print("Usage: " + sys.argv[0] + " loopCount")
     sys.exit()
@@ -44,7 +47,7 @@ i = 0
 while i < int(loopCount): 
     story = freeplay_chat.get_completion(
         project_id=os.environ['FREEPLAY_PROJECT_ID'],
-        template_name="initialize_story",
+        template_name=promptType,
         variables={"context":context},
         tag=freeplay_environment
     )
@@ -54,7 +57,7 @@ while i < int(loopCount):
     prevTime = datetime.datetime.now()
     response = client.audio.speech.create(
         model="tts-1-hd",
-        voice="onyx",
+        voice=voiceType,
         input=story.content
     )
 
@@ -77,4 +80,4 @@ uploaded = utils.upload_to_aws(finalOutputPath,
     finalOutputFilename)
 
 utils.deleteTempMp3(loopCount)
-os.remove(finalOutputPath)
+#os.remove(finalOutputPath)
