@@ -8,6 +8,13 @@ Requirements:
 Tests:
 run "python3[.11] audiotests.py" to make sure tests pass.
 
+# Usage
+
+python generateaudio.py LOOPCOUNT PROMPTNAME VOICE GENDER PROVIDER DAY
+
+ElevenLabs example: python generateaudio.py 25 initialize_weather_story ThT5KcBeYPX3keUQqHPh female ElevenLabs Thursday
+OpenAI example: python generateaudio.py 25 initialize_story onyx male OpenAI Monday
+
 # Amazon Linux EC2 instance setup
 
 - SETUP base environment

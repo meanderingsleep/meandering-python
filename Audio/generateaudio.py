@@ -24,7 +24,11 @@ try:
     loopCount = sys.argv[1]
     promptType = sys.argv[2] 
     voiceType = sys.argv[3]
-    print("Looping: " + sys.argv[1] + " times" + "\n" + "Prompt: " + sys.argv[2] + "\n" + "Voice: " + sys.argv[3])
+    gender = sys.argv[4]
+    provider = sys.argv[5]
+    day = sys.argv[6]
+    print("Looping: " + sys.argv[1] + " times" + "\n" + "Prompt: " + sys.argv[2] + "\n" + "Voice: " + 
+          sys.argv[3] + "\n" "Gender: " + sys.argv[4] + "\n" + "Provider: " + sys.argv[5] + "\n" + "Day: " + day)
 except:
     print("Usage: " + sys.argv[0] + " loopCount")
     sys.exit()
@@ -53,25 +57,52 @@ while i < int(loopCount):
     )
 
     context = utils.getLast20Words(story.content)
+    
+    if (provider == 'OpenAI'):
+        response = client.audio.speech.create(
+            model="tts-1-hd",
+            voice=voiceType,
+            input=story.content
+        )
+        response.write_to_file(Path(__file__).parent / f"temp_output{i}.mp3")
+        merged += AudioSegment.from_file(Path(__file__).parent / f'temp_output{i}.mp3')
 
-    prevTime = datetime.datetime.now()
-    response = client.audio.speech.create(
-        model="tts-1-hd",
-        voice=voiceType,
-        input=story.content
-    )
+    elif (provider == 'ElevenLabs'):
+        tts_url = f'https://api.elevenlabs.io/v1/text-to-speech/{voiceType}'
+        CHUNK_SIZE = 1024
+        headers = {
+        "Accept": "application/json",
+        "xi-api-key": os.environ['XI_API_KEY']
+        }
 
-    # do some rudimentary rate limiting
-    ttsCallsPerMinute = 3
-    if (datetime.datetime.now() - prevTime).seconds < (60/ttsCallsPerMinute):
-        time.sleep(60-(60/ttsCallsPerMinute))
+        data = {
+            "text": story.content,
+            "model_id": "eleven_turbo_v2",
+            "voice_settings": {
+                "stability": 0.9,
+                "similarity_boost": 0.9,
+                "style": 0.0,
+                "use_speaker_boost": True
+                }
+        }
+        
+        response = requests.post(tts_url, headers=headers, json=data, stream=True)
+        if response.ok:
+            with open(f"temp_output{i}.mp3", "wb") as f:
+                for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+                    f.write(chunk)
+                merged += AudioSegment.from_file(Path(__file__).parent / f'temp_output{i}.mp3')
+        else:
+            print(response.text)
 
-    response.write_to_file(Path(__file__).parent / f"temp_output{i}.mp3")
-    merged += AudioSegment.from_file(Path(__file__).parent / f'temp_output{i}.mp3')
     i += 1
 
 # Export final file to cloud and cleanup temp files
-finalOutputFilename = f"sleepless-{date.today()}.mp3"
+if promptType == 'initialize_story':
+    promptType = 'classic'
+elif promptType == 'initialize_weather_story':
+    promptType = 'weather'
+finalOutputFilename = f"{day}_{promptType}_{gender}.mp3"
 finalOutputPath = Path(__file__).parent / finalOutputFilename
 merged.export(finalOutputPath, format="mp3", bitrate="192k")
 
