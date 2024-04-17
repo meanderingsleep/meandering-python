@@ -10,10 +10,12 @@ run "python3[.11] audiotests.py" to make sure tests pass.
 
 # Usage
 
-python generateaudio.py LOOPCOUNT PROMPTNAME VOICE GENDER PROVIDER DAY
-
+Template: python generateaudio.py LOOPCOUNT PROMPTNAME VOICE GENDER PROVIDER DAY
 ElevenLabs example: python generateaudio.py 25 initialize_weather_story ThT5KcBeYPX3keUQqHPh female ElevenLabs Thursday
 OpenAI example: python generateaudio.py 25 initialize_story onyx male OpenAI Monday
+
+Cronjob for generateweek.sh:
+56 23 * * * /bin/bash /home/ec2-user/sleepless/Audio/generateweek.sh >> /home/ec2-user/sleepless/Audio/generateweek.log 2>&1
 
 # Amazon Linux EC2 instance setup
 
