@@ -14,6 +14,13 @@ Template: python generateaudio.py LOOPCOUNT PROMPTNAME VOICE GENDER PROVIDER DAY
 ElevenLabs example: python gendriver.py 25 initialize_weather_story ThT5KcBeYPX3keUQqHPh female elevenlabs thursday
 OpenAI example: python gendriver.py 25 initialize_story onyx male openai monday
 
+# Output files for S3
+* tag the output files in S3 (there should be a way to do this during upload) with three tags:
+  * ```type=boring|classic|weather```
+  * ```gender=male|female```
+  * ```day=Mon|Tue|Wed|Thu|Fri|Sat|Sun```
+
+
 # Amazon Linux EC2 instance setup
 
 - SETUP base environment
