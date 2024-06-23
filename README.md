@@ -1,21 +1,18 @@
 # sleepless
 
 Requirements:
-- python 3.11.6 (3.11.6+ might work)
-- python3[.11] -m pip install -r requirements.txt (generate requirements.txt via pipreqs)
+- python3
+- python3 -m pip install -r requirements.txt (generate requirements.txt via pipreqs)
 - ffmpeg install near bottom of - https://github.com/jiaaro/pydub#installation
 
 Tests:
-run "python3[.11] audiotests.py" to make sure tests pass.
+run "python3 audiotests.py" to make sure tests pass.
 
 # Usage
 
 Template: python generateaudio.py LOOPCOUNT PROMPTNAME VOICE GENDER PROVIDER DAY
-ElevenLabs example: python generateaudio.py 25 initialize_weather_story ThT5KcBeYPX3keUQqHPh female ElevenLabs Thursday
-OpenAI example: python generateaudio.py 25 initialize_story onyx male OpenAI Monday
-
-Cronjob for generateweek.sh:
-56 23 * * * /bin/bash /home/ec2-user/sleepless/Audio/generateweek.sh >> /home/ec2-user/sleepless/Audio/generateweek.log 2>&1
+ElevenLabs example: python gendriver.py 25 initialize_weather_story ThT5KcBeYPX3keUQqHPh female elevenlabs thursday
+OpenAI example: python gendriver.py 25 initialize_story onyx male openai monday
 
 # Amazon Linux EC2 instance setup
 
@@ -44,6 +41,6 @@ Cronjob for generateweek.sh:
 - sudo systemctl enable crond
 - sudo systemctl status crond
 
-- Add the following to crontab and adjust timing depending on needs
+- Crontab Example: (NOTE: You need to absolute path each file in the gen scripts and in the cron job)
 - python3.11 /home/ec2-user/sleepless/Audio/generateaudio.py 2 > /usr/tmp/generateaudio.log 2>&1
-- Also edit generateaudio.py to include the absolute path of the temp audio mp3 paths: /home/ec2-user/sleepless/Audio (this should be the path)
+

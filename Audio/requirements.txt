@@ -1,9 +1,0 @@
-boto3==1.34.38
-botocore==1.34.38
-ffmpeg==1.4
-freeplay==0.2.37
-openai==1.12.0
-pydub==0.25.1
-python-dotenv==1.0.1
-python_ffmpeg==2.0.10
-Requests==2.31.0

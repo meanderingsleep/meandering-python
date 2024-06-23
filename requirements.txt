@@ -1,0 +1,8 @@
+boto3==1.34.38
+botocore==1.34.38
+freeplay==0.2.42
+numpy==1.24.2
+pydub==0.25.1
+python-dotenv==1.0.1
+Requests==2.32.3
+sounddevice==0.4.7
