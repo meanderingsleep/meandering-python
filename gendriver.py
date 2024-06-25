@@ -92,7 +92,7 @@ def main():
         finalOutputFilename)
 
     # Remove the final audio file
-    utils.deleteTempMp3()
+    utils.deleteTempMp3(args.loopCount)
     os.remove(finalOutputPath)
 
 if __name__ == "__main__":
