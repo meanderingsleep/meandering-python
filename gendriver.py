@@ -75,13 +75,6 @@ def main():
         elif (args.provider == 'cartesia'):
             response = cartesia.generatecartesia(story.content)
 
-        # if (args.provider == 'cartesia'):
-        #     audio_segment = AudioSegment.from_file(response)  # Read from the temporary file
-        
-        # else:
-        #     audio_data = response.read()
-        #     audio_segment = AudioSegment.from_file(io.BytesIO(audio_data))
-
         audio_data = response
         audio_segment = audio_data
         merged += audio_segment
@@ -99,6 +92,7 @@ def main():
         finalOutputFilename)
 
     # Remove the final audio file
+    utils.deleteTempMp3()
     os.remove(finalOutputPath)
 
 if __name__ == "__main__":
