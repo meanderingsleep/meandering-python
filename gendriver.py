@@ -75,10 +75,10 @@ def main():
         elif (args.provider == 'cartesia'):
             response = cartesia.generatecartesia(story.content)
 
-        audio_data = response.write_to_file(f'temp_{i}.mp3')
-        audio_segment = audio_data
+        response.write_to_file(f'temp_{i}.mp3')
+        audio_segment = AudioSegment.from_file(f'temp_{i}.mp3')
         merged += audio_segment
-        silence = AudioSegment.silent(duration=750) 
+        silence = AudioSegment.silent(duration=750)
         merged += silence
 
         i += 1
