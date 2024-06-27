@@ -86,12 +86,15 @@ def main():
     # Export to S3
     finalOutputFilename = f"{args.day}_{args.promptType}_{args.gender}.mp3"
     finalOutputPath = Path(__file__).parent / finalOutputFilename
-    merged.export(finalOutputPath, format="mp3", bitrate="192k")
-    uploaded = utils.upload_to_aws(finalOutputPath,
-        os.environ.get("AWS_S3_BUCKET"),
-        finalOutputFilename)
+    bucket_name = os.environ.get("AWS_S3_BUCKET")
 
-    # Remove the final audio file
+    # Check and archive existing file if it exists
+    utils.check_and_archive_s3_file(bucket_name, finalOutputFilename)
+
+    merged.export(finalOutputPath, format="mp3", bitrate="192k")
+    uploaded = utils.upload_to_aws(finalOutputPath, bucket_name, finalOutputFilename)
+
+    # Remove the final audio file and temp files
     utils.deleteTempMp3(args.loopCount)
     os.remove(finalOutputPath)
 

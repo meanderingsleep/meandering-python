@@ -26,6 +26,25 @@ def upload_to_aws(local_file, bucket, s3_file):
     except NoCredentialsError:
         raise NoCredentialsError
     
+# Check if file exists in S3 and move it to archive if it does
+def check_and_archive_s3_file(bucket, s3_file, archive_folder="archive/"):
+    s3_client = boto3.client('s3')
+
+    try:
+        s3_client.head_object(Bucket=bucket, Key=s3_file)
+        # If the object exists, move it to the archive folder
+        copy_source = {'Bucket': bucket, 'Key': s3_file}
+        archive_key = f"{archive_folder}{s3_file}"
+        s3_client.copy(copy_source, bucket, archive_key)
+        s3_client.delete_object(Bucket=bucket, Key=s3_file)
+        print(f"Moved existing file to archive: {archive_key}")
+    except s3_client.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == '404':
+            # The object does not exist, so no action needed
+            print(f"No existing file to move to archive.")
+        else:
+            raise
+    
 def deleteTempMp3(loopCount):
     i = 0
     while i < int(loopCount):
