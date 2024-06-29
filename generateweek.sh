@@ -1,6 +1,6 @@
 #!/bin/bash
 
-days=("Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday" "Sunday")
+days=("Saturday" "Sunday")
 
 for day in "${days[@]}"; do
   python3 gendriver.py 20 boring onyx male openai $day
