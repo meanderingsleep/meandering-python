@@ -1,8 +1,7 @@
 #!/bin/bash
 
-days=("Saturday" "Sunday")
+days=("Monday")
 
 for day in "${days[@]}"; do
-  python3 gendriver.py 20 meandering onyx male openai $day
-  python3 gendriver.py 20 meandering nova female openai $day
+  python3 gendriver.py 20 boring nova male openai $day
 done
