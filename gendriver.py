@@ -73,7 +73,7 @@ def main():
             response = elevenlabs.generatelevenlabs()
 
         elif (args.provider == 'cartesia'):
-            response = cartesia_script.generatecartesia(story.content)
+            response = cartesia_script.generacdtecartesia(story.content)
 
         response.write_to_file(f'temp_{i}.mp3')
         audio_segment = AudioSegment.from_file(f'temp_{i}.mp3')

@@ -5,7 +5,7 @@ import os
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-def generateopenai(voiceType, storyContent, i, promptType):
+def generateopenai(voiceType, storyContent):
     response = client.audio.speech.create(
                 model="tts-1-hd",
                 voice=voiceType,
