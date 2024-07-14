@@ -71,6 +71,7 @@ def main():
 
         elif (args.provider == 'elevenlabs'):
             response = elevenlabs.generatelevenlabs()
+            response = response.content
 
         elif (args.provider == 'cartesia'):
             response = cartesia_script.generatecartesia(story.content)
