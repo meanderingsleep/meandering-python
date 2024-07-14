@@ -6,7 +6,7 @@ from freeplay.provider_config import ProviderConfig, OpenAIConfig
 from pydub import AudioSegment
 import utils
 import argparse
-from gentypes import cartesia
+from gentypes import cartesia_script
 from gentypes import elevenlabs
 from gentypes import openai
 import io
