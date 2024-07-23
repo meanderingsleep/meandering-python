@@ -67,7 +67,7 @@ def main():
         context = utils.getLast20Words(story.content)
 
         if (args.provider == 'openai'):
-            response = openai.generateopenai(args.voiceType, story.content, i, args.promptType)
+            response = openai.generateopenai(args.voiceType, story.content)
 
         elif (args.provider == 'elevenlabs'):
             response = elevenlabs.generatelevenlabs()
