@@ -1,38 +1,48 @@
 import requests
+import subprocess
 
 url = "https://api.cartesia.ai/tts/bytes"
 
-def generatecartesia(storyContent):
-    transcipt = storyContent
-
-    payload = {
-        "model_id": "sonic-english",
-        "transcript": transcipt,
-        "duration": 123,
-        "voice": {
-            "mode": "id",
-            "id": "a88c785b-6266-404a-b02e-993df876a403"
-        },
-        "output_format": {
-            "container": "wav",  # Set to wav
-            "encoding": "pcm_s16le",
-            "sample_rate": 8000
-        },
-        "language": "en"
+headers = {
+    "Cartesia-Version": "2024-06-10",
+    "X-API-Key": "73fc7125-3416-4b04-82a5-0d4b3d5457c5",
+    "Content-Type": "application/json"
+}
+data = {
+    "transcript": "Welcome to Cartesia Sonic!",
+    "model_id": "sonic-english",
+    "voice": {
+        "mode": "id",
+        "id": "a0e99841-438c-4a64-b679-ae501e7d6091"
+    },
+    "output_format": {
+        "container": "raw",
+        "encoding": "pcm_f32le",
+        "sample_rate": 44100
     }
-    headers = {
-        "Cartesia-Version": "2024-06-10",
-        "X-API-Key": "f6e95745-ea2b-463c-aebe-0e4a1fef5c55",
-        "Content-Type": "application/json"
-    }
+}
 
-    response = requests.request("POST", url, json=payload, headers=headers)
+response = requests.post(url, headers=headers, json=data, stream=True)
 
-    return response
+if response.status_code == 200:
 
-    # if response.status_code == 200:
-    #     with open("output.wav", "wb") as f:
-    #         f.write(response.content)
-    #     print("Audio saved as output.wav")
-    # else:
-    #     print("Failed to get audio:", response.text)
+    ffmpeg_command = [
+        "ffmpeg",
+        "-f", "f32le",
+        "-i", "pipe:",
+        "sonic.wav"
+    ]
+    
+    process = subprocess.Popen(ffmpeg_command, stdin=subprocess.PIPE)
+    
+    for chunk in response.iter_content(chunk_size=8192):
+        if chunk:
+            process.stdin.write(chunk)
+    
+    process.stdin.close()
+    process.wait()
+    
+    print("Audio file 'sonic.wav' has been created.")
+else:
+    print(f"Error: {response.status_code}")
+    print(response.text)
