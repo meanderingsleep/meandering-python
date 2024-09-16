@@ -1,11 +1,12 @@
 import requests
 import subprocess
+import os
 
 url = "https://api.cartesia.ai/tts/bytes"
 
 headers = {
     "Cartesia-Version": "2024-06-10",
-    "X-API-Key": "73fc7125-3416-4b04-82a5-0d4b3d5457c5",
+    "X-API-Key": os.environ.get("CARTESIA_API_KEY"),
     "Content-Type": "application/json"
 }
 data = {
